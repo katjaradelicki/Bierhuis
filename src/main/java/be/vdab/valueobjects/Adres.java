@@ -9,20 +9,24 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import be.vdab.constraints.Postcode;
+
 @Embeddable
 public class Adres implements Serializable{
 	private static final long serialVersionUID=1L;
 	
 	@Size(min=1,max=50,message="{Size.tekst}")
+	@NotNull
 	String straat;
 	@Size(min=1,max=50,message="{Size.tekst}")
+	@NotNull
 	String huisNr;
 	@Column(name="postCode")
 	@NotNull
-	@Min(1000)
-	@Max(9999)
+	@Postcode
 	Integer postcode;
 	@Size(min=1,max=50,message="{Size.tekst}")
+	@NotNull
 	String gemeente;
 	public Adres(String straat, String huisNr, Integer postcode, String gemeente) {
 		this.straat = straat;

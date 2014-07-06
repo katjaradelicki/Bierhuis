@@ -104,10 +104,14 @@ public class Bier implements Serializable{
 		this.prijs = prijs;
 	}
 	
+	
+	public void setBierNr(long bierNr) { //setter nodig opdat Spring het bierNr kan zetten in de form bestelbonLijn
+		this.bierNr = bierNr;
+	}
 	@Override
 	public String toString() {
 		
-		return this.naam+"("+brouwer+","+soort+","+prijs+","+percentageAlcohol+")";
+		return this.naam+"("+bierNr+":"+brouwer+","+soort+","+prijs+","+percentageAlcohol+")";
 	}
 	
 	

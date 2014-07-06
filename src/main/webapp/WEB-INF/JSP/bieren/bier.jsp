@@ -29,9 +29,15 @@
 <c:url var="winkelwagenUrl" value="/winkelwagen">
 <c:param name="idBier" value="${gekozenBier.bierNr}"></c:param>
 </c:url>
-<form:form action="${winkelwagenUrl}" method="post" commandName="bestelbonLijnForm">
+<form:form action="${winkelwagenUrl}" method="post" commandName="bestelbonLijn">
 <dl><dt>Aantal</dt>
-<dd><form:input path="aantal" type="number" autofocus="autofocus"/>  <!--  autofocus werkt NIET in firefox (in chrome wel) -->
+<dd><form:input path="aantal"  autofocus="autofocus"/>
+  <!--  autofocus werkt NIET in firefox (in chrome wel) -->
+  <form:errors path="aantal" cssClass="fout"/>
+ <!-- hoe zorgen dat bier ook ingevuld is van de bestelbonLijn?  <form:hidden path="bier.bierNr"/> -->
+ <form:hidden path="bier.bierNr"/><!-- bierNr krijgt waarde 0 ????? REDEN: bierNr had geen setter--> 
+ <form:hidden path="bier.naam"/><!-- naam wordt correct doorgegeven -->
+
 </dd>
 </dl>
 <input type="submit" value="Toevoegen" />

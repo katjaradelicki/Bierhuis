@@ -34,13 +34,13 @@ ${sessionScope.winkelwagenOnSession}
 <dl>
 <dt><form:label path="naam">Naam</form:label><form:errors path='naam' cssClass='fout'/> </dt>
 <dd><form:input path="naam" autofocus='autofocus'/></dd>
-<dt><form:label path="adres.straat">Straat</form:label></dt>
+<dt><form:label path="adres.straat">Straat</form:label><form:errors path='adres.straat' cssClass='fout'/></dt>
 <dd><form:input  path="adres.straat"/></dd>
-<dt><form:label path="adres.huisNr">Huisnummer</form:label></dt>
+<dt><form:label path="adres.huisNr">Huisnummer</form:label><form:errors path='adres.huisNr' cssClass='fout'/></dt>
 <dd><form:input path="adres.huisNr"/></dd>
 <dt><form:label path="adres.postcode" type="number">Postcode</form:label><form:errors path='adres.postcode' cssClass='fout'/></dt>
 <dd><form:input path="adres.postcode"/></dd>
-<dt><form:label path="adres.gemeente">Gemeente</form:label></dt>
+<dt><form:label path="adres.gemeente">Gemeente</form:label><form:errors path='adres.gemeente' cssClass='fout'/></dt>
 <dd><form:input path="adres.gemeente"/></dd>
 </dl>
 <input type="submit" value="Als bestelbon bevestigen"/>

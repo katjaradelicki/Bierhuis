@@ -37,16 +37,24 @@ public class WinkelwagenController {
 	}
 	
 	@RequestMapping(method=RequestMethod.POST,params="idBier")
-	public String voegBestelLijnToe(BestelbonLijn bestelbonLijnForm,@RequestParam long idBier){
-		int aantal=bestelbonLijnForm.getAantal();
-		BestelbonLijn lijn=new BestelbonLijn(bierService.find(idBier), aantal);
-		if(winkelwagenOnSession.getBestelbon()==null){//winkelwagenOnSession <> null
-			winkelwagenOnSession.setBestelbon(new Bestelbon());
+	public ModelAndView voegBestelLijnToe(@Valid BestelbonLijn bestelbonLijn,BindingResult bindingResult, @RequestParam long idBier){
+		System.out.println("requestmapping method voegBestelLijnToe en bindingResult: "+bindingResult.getAllErrors().toString());
+		System.out.println("*************************de form bestelbonLijn: "+bestelbonLijn);
+		if(!bindingResult.hasErrors()){
+			int aantal=bestelbonLijn.getAantal();
+			long bierNr=bestelbonLijn.getBier().getBierNr();
+			System.out.println("******************* bierNr: "+bierNr + " en bier is "+bestelbonLijn.getBier());
+			BestelbonLijn lijn=new BestelbonLijn(bierService.find(idBier), aantal);
+			if(winkelwagenOnSession.getBestelbon()==null){//winkelwagenOnSession <> null
+				winkelwagenOnSession.setBestelbon(new Bestelbon());
+			}
+			winkelwagenOnSession.getBestelbon().addBestelbonLijn(lijn);
+			return new ModelAndView("redirect:/winkelwagen/overzicht");//gaat dat: ModelAndView ipv String? Blijkbaar wel. Maar request attributen bij een redirect wel anders toevoegen dan via ModelAndView.
+		}else{
+		
+			ModelAndView modelAndView=new ModelAndView("/bieren/bier","gekozenBier",bierService.find(idBier));
+			return modelAndView;
 		}
-		winkelwagenOnSession.getBestelbon().addBestelbonLijn(lijn);
-		System.out.println("lijn toegevoed in controller: "+lijn);
-		System.out.println("winkelwagenOnSession.getBestelbon(): "+winkelwagenOnSession.getBestelbon());
-		return "redirect:/winkelwagen/overzicht";
 		
 	}
 	@RequestMapping(value="/overzicht",method=RequestMethod.GET)
@@ -63,8 +71,7 @@ public class WinkelwagenController {
 		//bestelbon in db opslaan
 		//mandje van sessie halen
 		//transactie van maken?
-		System.out.println(bindingResult.getAllErrors().toString());
-		if(!bindingResult.hasErrors()){ System.out.println("geen errors");
+		if(!bindingResult.hasErrors()){ 
 		String naam=bestelbon.getNaam();
 		String straat=bestelbon.getAdres().getStraat();
 		String huisNr=bestelbon.getAdres().getHuisNr();
@@ -79,8 +86,9 @@ public class WinkelwagenController {
 		//bestelbonNr nog doorgeven 
 		redirectAttributes.addAttribute("bestelbonNr", bestelbonToCreate.getBestelbonNr());
 		return "redirect:/winkelwagen/besteld";
-		}else {System.out.println("errors");
-			return "winkelwagen/overzicht";}
+		}else {
+			return "winkelwagen/overzicht";
+		}
 	}
 	
 	@RequestMapping(value="/besteld",method=RequestMethod.GET,params="bestelbonNr")
@@ -91,9 +99,9 @@ public class WinkelwagenController {
 	
 	@InitBinder("bestelbon")
 	public void initBinderBestelbon(DataBinder dataBinder){
-		System.out.println("in initBinder-method");
-		dataBinder.setRequiredFields("naam");
-		System.out.println(dataBinder.getRequiredFields()[0]/*+" "+dataBinder.getRequiredFields()[1]*/);
+		
+		//dataBinder.setRequiredFields("naam","adres.straat","adres.huisNr","adres.postcode","adres.gemeente");//vervangen door bean validation
+		
 	}
 	
 }

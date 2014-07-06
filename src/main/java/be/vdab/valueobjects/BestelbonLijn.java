@@ -6,6 +6,8 @@ import java.math.BigDecimal;
 import javax.persistence.Embeddable;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 import be.vdab.entities.Bier;
 
@@ -15,11 +17,14 @@ public class BestelbonLijn implements Serializable{
 	@ManyToOne
 	@JoinColumn(name="BierNr")
 	private Bier bier;
+	@NotNull
+	@Min(1)
 	private Integer aantal; //Integer van gemaakt ipv int om zo een leeg invoervak te verkrijgen (null) ipv 0 in het invoervak
 	
 	public BestelbonLijn(){ //voor JPA en  om BestelbonLijn als command object te gebruiken
 		
 	}
+
 
 	public Bier getBier() {
 		return bier;
@@ -41,11 +46,20 @@ public class BestelbonLijn implements Serializable{
 		this.bier=bier;
 		this.aantal=aantal;
 	}
-
+/* bier kan null zijn --> nullpointerException (dus nullproof maken)
 	@Override
 	public int hashCode() {
 		
 		return bier.hashCode();
+	}
+	*/
+	@Override
+	public int hashCode() {
+		
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((bier == null) ? 0 : (int) bier.getBierNr());
+		return result;
 	}
 
 	@Override

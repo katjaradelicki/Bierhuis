@@ -17,6 +17,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import be.vdab.valueobjects.Adres;
@@ -34,6 +35,7 @@ public class Bestelbon implements Serializable{
 	@OrderBy("bier.naam") //als je lijnen uit de databank zou lezen dan zijn ze gesorteerd op bier.naam?
 	private Set<BestelbonLijn> bestelbonLijnen;
 	@Size(min=1,max=50,message="{Size.tekst}")
+	@NotNull
 	private String naam;
 	@Embedded
 	@Valid
@@ -67,31 +69,24 @@ public class Bestelbon implements Serializable{
 	}
 	
 	public void addBestelbonLijn(BestelbonLijn lijn){
-		System.out.println("BestelbonLijnen: ");
-		for(BestelbonLijn l:bestelbonLijnen){
-			System.out.println(l);
-		}
+		
 		if(bestelbonLijnen.contains(lijn)){
 			BestelbonLijn teVerangenLijn=null;
 			BestelbonLijn nieuweLijn=null;
-			System.out.println("bestelbonLijn zit er al in");
+			
 			for(BestelbonLijn oudeLijn:bestelbonLijnen){
-				System.out.println("in lus en oudeLijn is "+oudeLijn);
 				if(oudeLijn.equals(lijn)){
-					System.out.println("gelijke lijn gevonden nl "+lijn);
 					nieuweLijn=new BestelbonLijn(oudeLijn.getBier(), oudeLijn.getAantal()+lijn.getAantal());
 					//bestelbonLijnen.remove(oudeLijn);//verzameling overlopen en ondertussen elementen verwijderen en toevoegen in gevaarlijk--> buiten de lus doen
 					//bestelbonLijnen.add(nieuweLijn);
 					teVerangenLijn=oudeLijn;
-					System.out.println("lijn aangepast");
+					
 				}
 			}
 			bestelbonLijnen.remove(teVerangenLijn);
 			bestelbonLijnen.add(nieuweLijn);
 		}else{
-		System.out.println("bestelbonLijn zit er nog niet in");
 			bestelbonLijnen.add(lijn);
-			System.out.println("na toevoeging lijn is bestelbonLijnen: "+bestelbonLijnen);
 		}
 	}
 	

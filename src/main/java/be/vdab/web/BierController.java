@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import be.vdab.entities.Bier;
 import be.vdab.services.BierService;
 import be.vdab.services.BrouwerService;
 import be.vdab.valueobjects.BestelbonLijn;
@@ -36,8 +37,12 @@ public class BierController {
 	
 	@RequestMapping(value="/bier",params="idBier",method=RequestMethod.GET)
 	public ModelAndView toonDetailBier(@RequestParam long idBier){
-		ModelAndView modelAndView=new ModelAndView("/bieren/bier","gekozenBier",bierService.find(idBier));
-		modelAndView.addObject("bestelbonLijnForm", new BestelbonLijn());
+		
+		Bier gekozenBier=bierService.find(idBier);
+		ModelAndView modelAndView=new ModelAndView("/bieren/bier","gekozenBier",gekozenBier);
+		BestelbonLijn lijn=new BestelbonLijn();
+		lijn.setBier(gekozenBier);//bier van de form al invullen want wordt niet ingevuld via invoervak en bij hashcode() op bestelbonLijn krijg je een nullpointerException (bij validatie) (want je doet bier.hashcode())
+		modelAndView.addObject("bestelbonLijn", lijn);
 		return  modelAndView;
 	}
 	
