@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import be.vdab.dao.BestelbonDAO;
 import be.vdab.entities.Bestelbon;
+import be.vdab.exceptions.BestelbonHeeftGeenBestelbonLijnenException;
 @Service
 public class BestelbonServiceImpl implements BestelbonService{
 	private final BestelbonDAO bestelbonDAO;
@@ -18,7 +19,11 @@ public class BestelbonServiceImpl implements BestelbonService{
 	@Override
 	@Transactional
 	public void create(Bestelbon bestelbon) {
-		bestelbonDAO.save(bestelbon);
+		if(!bestelbon.getBestelbonLijnen().isEmpty()){
+			bestelbonDAO.save(bestelbon);
+		}else{
+			throw new BestelbonHeeftGeenBestelbonLijnenException();
+		}
 		
 		
 	}

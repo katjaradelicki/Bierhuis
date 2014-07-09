@@ -4,7 +4,7 @@
 auth='Container'
 type='javax.sql.DataSource'
 username='root'
-password='mysql'
+password='vdab'
 driverClassName='com.mysql.jdbc.Driver'
 url='jdbc:mysql://localhost/bierhuis'
 factory='org.apache.tomcat.jdbc.pool.DataSourceFactory'

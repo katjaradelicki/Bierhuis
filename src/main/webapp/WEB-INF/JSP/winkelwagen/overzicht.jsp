@@ -43,6 +43,7 @@ ${sessionScope.winkelwagenOnSession}
 <dt><form:label path="adres.gemeente">Gemeente</form:label><form:errors path='adres.gemeente' cssClass='fout'/></dt>
 <dd><form:input path="adres.gemeente"/></dd>
 </dl>
+<form:errors cssClass="fout" />
 <input type="submit" value="Als bestelbon bevestigen"/>
 
 </form:form>

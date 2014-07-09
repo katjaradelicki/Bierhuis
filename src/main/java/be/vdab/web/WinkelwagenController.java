@@ -1,10 +1,11 @@
 package be.vdab.web;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.DataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -17,6 +18,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import be.vdab.entities.Bestelbon;
+import be.vdab.exceptions.BestelbonHeeftGeenBestelbonLijnenException;
 import be.vdab.services.BestelbonService;
 import be.vdab.services.BierService;
 import be.vdab.valueobjects.Adres;
@@ -24,6 +26,7 @@ import be.vdab.valueobjects.BestelbonLijn;
 
 @Controller
 @RequestMapping("/winkelwagen")
+@SessionAttributes("bestelbon")
 public class WinkelwagenController {
 	
 	private final BierService bierService;
@@ -58,10 +61,12 @@ public class WinkelwagenController {
 		
 	}
 	@RequestMapping(value="/overzicht",method=RequestMethod.GET)
-	public ModelAndView toonOverzicht(){
+	public ModelAndView toonOverzicht(HttpServletRequest request){
 		//sessie ook rechtstreeks aanspreken in jsp? ${not empty sessionScope.winkelwagenOnSession.bestelbon.bestelbonLijnen} werkt niet. winkelwagenOnSession is leeg
 		ModelAndView modelAndView=new ModelAndView("/winkelwagen/overzicht","winkelwagen",winkelwagenOnSession);
+		
 		modelAndView.addObject("bestelbon", new Bestelbon());
+		
 		return modelAndView;
 	}
 	
@@ -72,20 +77,31 @@ public class WinkelwagenController {
 		//mandje van sessie halen
 		//transactie van maken?
 		if(!bindingResult.hasErrors()){ 
-		String naam=bestelbon.getNaam();
-		String straat=bestelbon.getAdres().getStraat();
-		String huisNr=bestelbon.getAdres().getHuisNr();
-		Integer postcode=bestelbon.getAdres().getPostcode();
-		String gemeente=bestelbon.getAdres().getGemeente();
-		Bestelbon bestelbonToCreate=winkelwagenOnSession.getBestelbon();//bestelbonLijnen zijn ingevuld
-		bestelbonToCreate.setNaam(naam);
-		bestelbonToCreate.setAdres(new Adres(straat,huisNr,postcode,gemeente));
-		
-		bestelbonService.create(bestelbonToCreate);
-		winkelwagenOnSession.setBestelbon(null);//sessie bean te verwijderen? dan kan je het niet hercreëren dus niet verwijderen
-		//bestelbonNr nog doorgeven 
-		redirectAttributes.addAttribute("bestelbonNr", bestelbonToCreate.getBestelbonNr());
-		return "redirect:/winkelwagen/besteld";
+			String naam=bestelbon.getNaam();
+			String straat=bestelbon.getAdres().getStraat();
+			String huisNr=bestelbon.getAdres().getHuisNr();
+			Integer postcode=bestelbon.getAdres().getPostcode();
+			String gemeente=bestelbon.getAdres().getGemeente();
+			Bestelbon bestelbonToCreate=winkelwagenOnSession.getBestelbon();//bestelbonLijnen zijn ingevuld
+			if(bestelbonToCreate!=null){
+				bestelbonToCreate.setNaam(naam);
+				bestelbonToCreate.setAdres(new Adres(straat,huisNr,postcode,gemeente));
+				
+				try{
+					bestelbonService.create(bestelbonToCreate);
+					winkelwagenOnSession.setBestelbon(null);//sessie bean te verwijderen? dan kan je het niet hercreëren dus niet verwijderen
+					//bestelbonNr nog doorgeven 
+					redirectAttributes.addAttribute("bestelbonNr", bestelbonToCreate.getBestelbonNr());
+					return "redirect:/winkelwagen/besteld";
+				}catch(BestelbonHeeftGeenBestelbonLijnenException ex){
+					bindingResult.reject("foutCreatieBestelbon");
+					return "winkelwagen/overzicht";
+				}
+			}else{
+				//bestelbonToCreate is nog null omdat je nog geen bestellijn hebt toegevoegd
+				bindingResult.reject("foutCreatieBestelbon");// krijg je te zien bij form:errors in jsp 
+				return "winkelwagen/overzicht";
+			}
 		}else {
 			return "winkelwagen/overzicht";
 		}
